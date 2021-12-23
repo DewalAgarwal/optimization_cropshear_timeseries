@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "# THIS SCRIPT IS USED FOR THE STATISTICAL COMPUTING OF THE FORECAST FOR THE SETPOINTS\n# BASED UPON THE HISTORICAL DATA\n\nargs <- commandArgs()\nheadFilePath <- args[2]\ntailFilePath <- args[3]\noutputFilePath <- args[4]\n\nlibrary(\"TTR\")\nlibrary(\"forecast\")\n\n## The script will need the L2 Sp for the Head and Tail, as well as \n## the corresponding value of the grade.\n\n# SCANNING THE PREVIOUS VALUES OF HEAD AND TAIL SETPOINTS\ngd_h <- scan(headFilePath, skip=1);\ngd_t <- scan(tailFilePath, skip=1);\n\n\n# FORMULATION OF THE TIME SERIES\ngd_hts <- ts(gd_h);\ngd_tts <- ts(gd_t);\n\n#PLOTTING THE TIME SERIES CHARTS AND SAVING IT\npng(file = \"C:/Users/Dewal Agarwal/Desktop/Intern Project/CropShearSetPoint/Resources/Dynamic Plots/gd_hts_plot.jpg\");\nplot(gd_hts, type=\"o\", col= \"black\", main = \"Time Series Head\");\ndev.off();\npng(file = \"C:/Users/Dewal Agarwal/Desktop/Intern Project/CropShearSetPoint/Resources/Dynamic Plots/gd_tts_plot.jpg\");\nplot(gd_tts, type=\"o\", col= \"black\", main = \"Time Series Tail\");\ndev.off();\n\n# #[OP] CALCULATION OF MOVING AVERAGES\n# gd_htsSMA5 <- SMA(gd_hts, n=5);\n# gd_ttsSMA5 <- SMA(gd_tts, n=5);\n\n# Smoothing using Holt-Winters function (SES & DES)\n\n# HEAD & TAIL SES smoothing\n# gd_hSES <- HoltWinters(gd_hts, beta =  FALSE, gamma = FALSE)\n# gd_tSES <- HoltWinters(gd_tts, beta = FALSE, gamma = FALSE)\n\n# HEAD & TAIL DES smoothing\ngd_hDES <- HoltWinters(gd_hts, gamma = FALSE, l.start = gd_h[1], b.start = gd_h[2]-gd_h[1]);\ngd_tDES <- HoltWinters(gd_tts, gamma = FALSE, l.start = gd_t[1], b.start = gd_t[2]-gd_t[1]);\n\n# [op] Printing the value of the smooth parameters.\n# print(gd_hDES);\n# print(gd_tDES);\n\n# PLOTTING INPUT V/S THE FITTED VALUES\n# This part is working fine\npng(file = \"C:/Users/Dewal Agarwal/Desktop/Intern Project/CropShearSetPoint/Resources/Dynamic Plots/gd_hDES_plot.jpg\");\nplot(gd_hDES, type=\"o\",xlab= \"Bars\", main = \"Observed & Fitted Head\");\ndev.off();\npng(file = \"C:/Users/Dewal Agarwal/Desktop/Intern Project/CropShearSetPoint/Resources/Dynamic Plots/gd_tDES_plot.jpg\");\nplot(gd_tDES, type=\"o\",xlab= \"Bars\", main = \"Observed & Fitted Tail\");\ndev.off();\n\n# FORECASTING THE NEXT 'h' VALUES FOR THE HEAD AND THE TAIL\ngd_hDESfc = forecast.HoltWinters(gd_hDES, h=1);\ngd_tDESfc = forecast.HoltWinters(gd_tDES, h=1);\n\n# [op] Print the forecast for the head and tail\n# print(\"The Head setpoint is\");\n# print(gd_hDESfc)\n# print(\"The Tail setpoint is\");\n# print(gd_tDESfc)\n\n\nforecastH <- as.numeric(gd_tDESfc$mean)\nforecastT <- as.numeric(gd_hDESfc$mean)\n\n# OUTPUTTING THE FORECASTED VALUE IN THE TEXT FILE\nsink(outputFilePath)\nprint(forecastH)\nprint(forecastT)\nsink()\n\n## The output is read from the text file by the C# code \n# print(\"The head setpoint value is:\")\n# print(forecastH)\n# print(\"The tail setpoint value is:\")\n# print(forecastT)\n\n## Functions for adding the bias.\n#Final_SPH <- function(L2Hinput)\n#{ sp = (forecastH + L2Hinput)/2\n# There should be a provision for changing the entry from the exixting data base.  \n#}\n#print(\"Displaying the final setpoint with offset\"); \n#print(Final_SPH(500))\n\n##Final_SPT <- function(L2Tinput)\n#{ sp = (forecastT + L2Tinput)/2\n# There should be a provision for changing the entry from the exixting data base. \n#}\n#print(\"Displaying the final setpoint with offset\"); \n#print(Final_SPT(500))",
+    "created" : 1498139347010.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "23440412",
+    "id" : "655E502E",
+    "lastKnownWriteTime" : 1498818967,
+    "last_content_update" : 1498818967915,
+    "path" : "C:/Users/Dewal Agarwal/Desktop/Intern Project/CropShearSetPoint/R_Script/R_Script.R",
+    "project_path" : "R_Script.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
